@@ -1,0 +1,3 @@
+repository "Pedorido V2@XukeLho@cloud"
+  path "/"
+    smartbranch "/main/main_ReduceBuildSize"
