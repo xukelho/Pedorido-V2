@@ -20,12 +20,10 @@ public class MainUiNavigation : MonoBehaviour
     public GameObject UiIgreja;
     public GameObject UiAerodromo;
     public GameObject UiMinasPocoDeGermundeII;
-    public GameObject UiCampoFutebol;
-    public GameObject UiPassadico;
-    public GameObject UiCasaDaMalta;
     public GameObject UiPenedoDoLastrao;
     public GameObject UiCapelaSenhoraDasAmoras;
     public GameObject UiCapelaSaoDomingos;
+    public GameObject UiSobre;
     [Space]
     public GameObject UiPraia3dObj;
     public GameObject UiPonteVelha3dObj;
@@ -219,27 +217,6 @@ public class MainUiNavigation : MonoBehaviour
         LoadUi();
     }
 
-    public void LoadCampoFutebolUi()
-    {
-        _currentUi = UiCampoFutebol;
-
-        LoadUi();
-    }
-
-    public void LoadPassadicoUi()
-    {
-        _currentUi = UiPassadico;
-
-        LoadUi();
-    }
-
-    public void LoadCasaDaMaltaUi()
-    {
-        _currentUi = UiCasaDaMalta;
-
-        LoadUi();
-    }
-
     public void LoadPenedoDoLastraoUi()
     {
         _currentUi = UiPenedoDoLastrao;
@@ -260,6 +237,14 @@ public class MainUiNavigation : MonoBehaviour
 
         LoadUi();
     }
+
+    public void LoadSobreUi()
+    {
+        _currentUi = UiSobre;
+
+        LoadUi();
+    }
+
     //--- Galleries ---
     public void LoadGalleryPraia()
     {
