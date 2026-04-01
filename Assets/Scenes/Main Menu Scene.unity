@@ -9298,7 +9298,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Campo de Futebol\nPassadi\xE7os\nCasa da Malta\nParque das Merendas"
+  m_text: "Esta aplica\xE7\xE3o nasceu da iniciativa individual e do carinho que
+    tenho por Pedorido. Como qualquer projeto feito por uma s\xF3 pessoa, \xE9 um
+    trabalho em constante evolu\xE7\xE3o.\n\nEmbora existam locais emblem\xE1ticos
+    que ainda n\xE3o consegui incluir \u2014 como o Campo de Futebol, os Passadi\xE7os,
+    a Casa da Malta ou o Parque das Merendas \u2014 a vontade de os ver aqui representados
+    permanece para futuras atualiza\xE7\xF5es.\n\nUma nota sobre as Men\xE7\xF5es
+    Honrosas:\nDecidi incluir alguns pontos fora dos limites geogr\xE1ficos de Pedorido.
+    Embora n\xE3o perten\xE7am \xE0 nossa freguesia, a sua liga\xE7\xE3o \xE0 nossa
+    popula\xE7\xE3o e \xE0 nossa hist\xF3ria \xE9 t\xE3o forte que n\xE3o poderiam
+    ficar de fora.\n\nEspero que desfrutem desta viagem pela nossa terra!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b2326eec245479a46b029015c3eb8f42, type: 2}
   m_sharedMaterial: {fileID: 2032832389646249427, guid: b2326eec245479a46b029015c3eb8f42, type: 2}
