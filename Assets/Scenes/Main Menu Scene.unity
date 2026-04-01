@@ -8799,6 +8799,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5464977902145844925, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8900089906688135769, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
       propertyPath: m_Name
       value: Menu Button AR Prefab
@@ -8899,6 +8903,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4028100323508807389, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5464977902145844925, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
+      propertyPath: m_Interactable
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8900089906688135769, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
@@ -18409,6 +18417,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5464977902145844925, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8900089906688135769, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
       propertyPath: m_Name
       value: Menu Button AR Prefab
@@ -18890,6 +18902,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4028100323508807389, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5464977902145844925, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
+      propertyPath: m_Interactable
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8900089906688135769, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
@@ -24468,6 +24484,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5464977902145844925, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8900089906688135769, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
       propertyPath: m_Name
       value: Menu Button AR Prefab
@@ -25421,6 +25441,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4028100323508807389, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5464977902145844925, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
+      propertyPath: m_Interactable
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8900089906688135769, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
@@ -31132,6 +31156,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4028100323508807389, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5464977902145844925, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
+      propertyPath: m_Interactable
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8900089906688135769, guid: a0f4be0b091afd24f83f45850d8ac0ab, type: 3}
