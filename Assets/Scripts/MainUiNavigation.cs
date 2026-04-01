@@ -44,9 +44,6 @@ public class MainUiNavigation : MonoBehaviour
     public GameObject GalleryIgrejaPedorido;
     public GameObject GalleryAerodromo;
     public GameObject GalleryPocoGermundeII;
-    public GameObject GalleryCampoFutebol;
-    public GameObject GalleryPassadico;
-    public GameObject GalleryCasaDaMalta;
     public GameObject GalleryPenedoDoLastrao;
     public GameObject GalleryCapelaSenhoraDasAmoras;
     public GameObject GalleryCapelaSaoDomingos;
@@ -66,10 +63,6 @@ public class MainUiNavigation : MonoBehaviour
     public CameraTouchOrbitController CameraController;
 
     private GameObject _currentUi;
-    private GameObject _current3dObject;
-    private bool _isDisplaying3dObject;
-
-    private Transform _mainCameraStartingTransform;
     #endregion
 
     #region Unity
@@ -79,8 +72,6 @@ public class MainUiNavigation : MonoBehaviour
         {
             MainCamera = Camera.main;
         }
-
-        _mainCameraStartingTransform = MainCamera.transform;
 
         if (_uiMenus.Count == 0)
         {
@@ -102,11 +93,6 @@ public class MainUiNavigation : MonoBehaviour
             if (_uiMenus != null && _uiMenus.Count > 1)
             {
                 Return();
-            }
-            else
-            {
-                // Opcional: fechar o app quando estiver no menu principal
-                // Application.Quit();
             }
         }
     }
@@ -324,30 +310,9 @@ public class MainUiNavigation : MonoBehaviour
         LoadUi();
     }
 
-    public void LoadGalleryCampoFutebol()
-    {
-        _currentUi = GalleryCampoFutebol;
-
-        LoadUi();
-    }
-
     public void LoadGalleryPenedoDoLastrao()
     {
         _currentUi = GalleryPenedoDoLastrao;
-
-        LoadUi();
-    }
-
-    public void LoadGalleryPassadico()
-    {
-        _currentUi = GalleryPassadico;
-
-        LoadUi();
-    }
-
-    public void LoadGalleryCasaDaMalta()
-    {
-        _currentUi = GalleryCasaDaMalta;
 
         LoadUi();
     }

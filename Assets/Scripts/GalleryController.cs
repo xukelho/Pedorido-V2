@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +8,8 @@ public class GalleryController : MonoBehaviour
     public MainUiNavigation MainUiNavigation;
 
     public List<Image> Images;
+
+    public ScrollViewController ScrollViewController;
 
     private Image _currentImage;
     #endregion //Fields
@@ -94,30 +95,9 @@ public class GalleryController : MonoBehaviour
         LoadImageByReference(imageRef);
     }
 
-    public void LoadGalleryCampoFutebolByImageReference(Image imageRef)
-    {
-        MainUiNavigation.LoadGalleryCampoFutebol();
-
-        LoadImageByReference(imageRef);
-    }
-
     public void LoadGalleryPenedoDoLastraoByImageReference(Image imageRef)
     {
         MainUiNavigation.LoadGalleryPenedoDoLastrao();
-
-        LoadImageByReference(imageRef);
-    }
-
-    public void LoadGalleryPassadicoByImageReference(Image imageRef)
-    {
-        MainUiNavigation.LoadGalleryPassadico();
-
-        LoadImageByReference(imageRef);
-    }
-
-    public void LoadGalleryCasaDaMaltaByImageReference(Image imageRef)
-    {
-        MainUiNavigation.LoadGalleryCasaDaMalta();
 
         LoadImageByReference(imageRef);
     }
@@ -139,19 +119,7 @@ public class GalleryController : MonoBehaviour
     #region Private
     private void LoadImageByReference(Image imageRef)
     {
-        foreach (var img in Images)
-        {
-            img.gameObject.SetActive(false);
-        }
-
-        if (!this.gameObject.activeSelf)
-        {
-            this.gameObject.SetActive(true);
-        }
-
-        _currentImage = Images.First(i => i.mainTexture == imageRef.mainTexture);
-
-        _currentImage.gameObject.SetActive(true);
+        ScrollViewController.SnapToImageByReference(imageRef);
     }
     #endregion //Private
 }
