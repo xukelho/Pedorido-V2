@@ -4,9 +4,11 @@ using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Linq;
+using System;
 
 public class PlaceOnPlaneController : MonoBehaviour
 {
+    #region Fields
     [Header("AR managers")]
     [SerializeField] ARPlaneManager ArPlaneManager;
     [SerializeField] ARRaycastManager ArRaycastManager;
@@ -20,11 +22,23 @@ public class PlaceOnPlaneController : MonoBehaviour
 
     static List<ARRaycastHit> _arRaycastHits = new List<ARRaycastHit>();
 
+    public MainUiNavigation Main;
+    #endregion //Fields
+
+    #region Unity
+
+    private void Start()
+    {
+        Main = GameObject.FindGameObjectWithTag("Main").GetComponent<MainUiNavigation>();
+    }
+
     void Update()
     {
         PlacePreviewObject();
     }
+    #endregion //Unity
 
+    #region Methods
     public void InstantiateObject()
     {
         Vector2 screenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
@@ -35,7 +49,11 @@ public class PlaceOnPlaneController : MonoBehaviour
 
             if (PrefabToPlace != null)
             {
-                var newObj = Instantiate(PrefabToPlace, hitPose.position, hitPose.rotation);
+                //var newObj = Instantiate(PrefabToPlace, hitPose.position, hitPose.rotation);
+
+                var prefabToPlace = GetPrefabToPlace();
+
+                var newObj = Instantiate(prefabToPlace, hitPose.position, hitPose.rotation);
                 newObj.SetActive(true);
             }
             else
@@ -44,7 +62,7 @@ public class PlaceOnPlaneController : MonoBehaviour
                 primitive.name = "PlacedCube";
                 primitive.transform.position = hitPose.position;
                 primitive.transform.rotation = hitPose.rotation;
-                
+
                 primitive.transform.localScale = Vector3.one * 0.2f;
             }
         }
@@ -52,6 +70,30 @@ public class PlaceOnPlaneController : MonoBehaviour
         {
             Debug.Log("Nenhum plano atingido pelo raycast.");
         }
+    }
+
+    private GameObject GetPrefabToPlace()
+    {
+        var previousUi = Main._uiMenus[Main._uiMenus.Count - 2];
+
+        if (previousUi == Main.UiPraia)
+            return Main.PrefabObj3dPraiaDosTesos;
+        if (previousUi == Main.UiPonteVelha)
+            return Main.PrefabObj3dPonteVelha;
+        if (previousUi == Main.UiEstatua)
+            return Main.PrefabObj3dEstatuaDosMineiros;
+        if (previousUi == Main.UiLocomotiva)
+            return Main.PrefabObj3dLocomotiva;
+        if (previousUi == Main.UiIgreja)
+            return Main.PrefabObj3dIgrejaPedorido;
+        if (previousUi == Main.UiAerodromo)
+            return Main.PrefabObj3dAerodromo;
+        if (previousUi == Main.UiMinasPocoDeGermundeII)
+            return Main.PrefabObj3dPocoGermundeII;
+        if (previousUi == Main.UiPenedoDoLastrao)
+            return Main.PrefabObj3dMonteSaoDomingos;
+
+        return null;
     }
 
     bool HasAnyPlanes()
@@ -68,8 +110,8 @@ public class PlaceOnPlaneController : MonoBehaviour
 
         if (PreviewPositionValid == null || !hasPlanes)
             return;
-        
-        if(_arRaycastHits.Count == 0)
+
+        if (_arRaycastHits.Count == 0)
         {
             PreviewPositionValid.SetActive(false);
             PreviewPositionInvalid.SetActive(false);
@@ -80,7 +122,7 @@ public class PlaceOnPlaneController : MonoBehaviour
         {
             Pose? hitPose = GetPosePoitingUp(_arRaycastHits);
 
-            if(hitPose == null)
+            if (hitPose == null)
             {
                 PreviewPositionValid.SetActive(false);
                 PreviewPositionInvalid.SetActive(true);
@@ -98,7 +140,7 @@ public class PlaceOnPlaneController : MonoBehaviour
 
             PreviewPositionValid.transform.position = hitPose.Value.position;
             PreviewPositionValid.transform.rotation = hitPose.Value.rotation;
-        }        
+        }
     }
 
     private Pose? GetPosePoitingUp(List<ARRaycastHit> arRaycastHits)
@@ -124,4 +166,6 @@ public class PlaceOnPlaneController : MonoBehaviour
         // None of the hits were pointing (approximately) up
         return null;
     }
+
+    #endregion //Methods
 }
