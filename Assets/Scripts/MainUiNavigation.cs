@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.UI;
+using TMPro;
+
 #if UNITY_EDITOR
 using UnityEngine.XR.Simulation;
 #endif
@@ -13,7 +16,7 @@ public class MainUiNavigation : MonoBehaviour
     #region Fields
 
     [Header("Debug")]
-    public List<GameObject> _uiMenus = new List<GameObject>();
+    public List<GameObject> UiMenus = new List<GameObject>();
 
     [Header("UI - Menus")]
     public GameObject UiMainMenu;
@@ -52,6 +55,8 @@ public class MainUiNavigation : MonoBehaviour
 
     [Header("UI - AR")]
     public GameObject UiAr;
+    public Button InstantiateArObjBtn;
+    public TextMeshProUGUI TextHelpGuideUsersAr;
 
     [Header("3D Objects Prefabs")]
     public GameObject PrefabObj3dPraiaDosTesos;
@@ -73,9 +78,22 @@ public class MainUiNavigation : MonoBehaviour
     private GameObject _currentUi;
 
     private GameObject _current3dObject;
+
+    public static MainUiNavigation Instance { get; private set; }
     #endregion
 
     #region Unity
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
     
     private void Start()
     {
@@ -84,9 +102,9 @@ public class MainUiNavigation : MonoBehaviour
             MainCamera = Camera.main;
         }
 
-        if (_uiMenus.Count == 0)
+        if (UiMenus.Count == 0)
         {
-            _uiMenus.Add(UiMainMenu);
+            UiMenus.Add(UiMainMenu);
         }
     }
 
@@ -101,7 +119,7 @@ public class MainUiNavigation : MonoBehaviour
 
         if (backPressed)
         {
-            if (_uiMenus != null && _uiMenus.Count > 1)
+            if (UiMenus != null && UiMenus.Count > 1)
             {
                 Return();
             }
@@ -113,32 +131,32 @@ public class MainUiNavigation : MonoBehaviour
 
     private void LoadUi()
     {
-        _uiMenus.Add(_currentUi);
+        UiMenus.Add(_currentUi);
 
         ShowCurrentUiMenu();
     }
 
     private void ShowCurrentUiMenu()
     {
-        for (int i = 0; i < _uiMenus.Count - 1; i++)
+        for (int i = 0; i < UiMenus.Count - 1; i++)
         {
-            var uiMenu = _uiMenus[i];
+            var uiMenu = UiMenus[i];
             uiMenu.SetActive(false);
         }
 
-        var lastUiMenu = _uiMenus[_uiMenus.Count - 1];
+        var lastUiMenu = UiMenus[UiMenus.Count - 1];
         lastUiMenu.SetActive(true);
     }
 
     public void Return()
     {
-        var lastUiMenu = _uiMenus[_uiMenus.Count - 1];
+        var lastUiMenu = UiMenus[UiMenus.Count - 1];
 
         var isArScene = lastUiMenu == UiAr;
 
         lastUiMenu.SetActive(false);
 
-        _uiMenus.Remove(lastUiMenu);
+        UiMenus.Remove(lastUiMenu);
 
         if(_current3dObject  != null)
         {
