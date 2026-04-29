@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using System.Linq;
-using System;
 
 public class PlaceOnPlaneController : MonoBehaviour
 {
@@ -23,6 +20,7 @@ public class PlaceOnPlaneController : MonoBehaviour
     static List<ARRaycastHit> _arRaycastHits = new List<ARRaycastHit>();
 
     public MainUiNavigation Main;
+
     #endregion //Fields
 
     #region Unity
@@ -49,12 +47,11 @@ public class PlaceOnPlaneController : MonoBehaviour
 
             if (PrefabToPlace != null)
             {
-                //var newObj = Instantiate(PrefabToPlace, hitPose.position, hitPose.rotation);
-
                 var prefabToPlace = GetPrefabToPlace();
 
                 var newObj = Instantiate(prefabToPlace, hitPose.position, hitPose.rotation);
                 newObj.SetActive(true);
+                newObj.tag = "ArObject";
             }
             else
             {
@@ -90,7 +87,7 @@ public class PlaceOnPlaneController : MonoBehaviour
             return Main.PrefabObj3dAerodromo;
         if (previousUi == Main.UiMinasPocoDeGermundeII)
             return Main.PrefabObj3dPocoGermundeII;
-        if (previousUi == Main.UiPenedoDoLastrao)
+        if (previousUi == Main.UiCapelaSaoDomingos)
             return Main.PrefabObj3dMonteSaoDomingos;
 
         return null;

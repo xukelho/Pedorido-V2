@@ -1,11 +1,12 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
+using System.Collections;
+using UnityEngine.XR.Interaction.Toolkit;
+#if UNITY_EDITOR
+using UnityEngine.XR.Simulation;
+#endif
 
 public class MainUiNavigation : MonoBehaviour
 {
@@ -132,6 +133,9 @@ public class MainUiNavigation : MonoBehaviour
     public void Return()
     {
         var lastUiMenu = _uiMenus[_uiMenus.Count - 1];
+
+        var isArScene = lastUiMenu == UiAr;
+
         lastUiMenu.SetActive(false);
 
         _uiMenus.Remove(lastUiMenu);
@@ -144,11 +148,95 @@ public class MainUiNavigation : MonoBehaviour
 
         ShowCurrentUiMenu();
 
+        if(isArScene)
+        {
+            UnloadArScene();
+        }
+    }
+
+    private void UnloadArScene()
+    {
+        StartCoroutine(UnloadArSceneCoroutine());
+    }
+
+    private IEnumerator UnloadArSceneCoroutine()
+    {
+        var unloadOperations = new List<AsyncOperation>();
+
+        // Request unload of the AR scene
+        unloadOperations.Add(SceneManager.UnloadSceneAsync("AR Object View Scene"));
+
+        // Request unload of any simulated environment scenes
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            var currentScene = SceneManager.GetSceneAt(i);
+
+            if (currentScene.name.StartsWith("Simulated Environment Scene") && currentScene.IsValid() && currentScene.isLoaded)
+            {
+                unloadOperations.Add(SceneManager.UnloadSceneAsync(currentScene));
+            }
+        }
+
+        // Wait for all unload operations to complete
+        bool allDone = false;
+        while (!allDone)
+        {
+            allDone = true;
+            for (int i = 0; i < unloadOperations.Count; i++)
+            {
+                if (unloadOperations[i] != null && !unloadOperations[i].isDone)
+                {
+                    allDone = false;
+                    break;
+                }
+            }
+
+            if (!allDone)
+                yield return null;
+        }
+
+        // Now that the scenes are unloaded, clean up DontDestroyOnLoad objects
+        CleanupPersistentArObjects();
+
+        // Re-enable main camera and event system after cleanup to avoid duplicate listeners
+        if (MainCamera != null)
+            MainCamera.gameObject.SetActive(true);
+        if (EventSystem != null)
+            EventSystem.gameObject.SetActive(true);
+
+        yield break;
+    }
+
+    private void CleanupPersistentArObjects()
+    {
+        var xrManagers = Resources.FindObjectsOfTypeAll<XRInteractionManager>();
+        foreach (var mgr in xrManagers)
+        {
+            if (mgr != null)
+                Destroy(mgr.gameObject);
+        }
+
+#if UNITY_EDITOR
+        var simCameras = Resources.FindObjectsOfTypeAll<SimulationCameraPoseProvider>();
+        foreach (var obj in simCameras)
+        {
+            if (obj != null)
+                Destroy(obj.gameObject);
+        }
+#endif
+
+        var debugUpdater = GameObject.Find("[Debug Updater]");
+        if (debugUpdater != null)
+            Destroy(debugUpdater);
+
+        var arObject = GameObject.FindGameObjectWithTag("ArObject");
+        if (arObject != null)
+            Destroy(arObject);
     }
 
     public void LoadPraiaUi()
     {
-        _currentUi = UiPraia;
+        _currentUi = UiPraia;   
 
         LoadUi();
     }
