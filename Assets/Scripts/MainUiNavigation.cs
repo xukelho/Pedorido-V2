@@ -1,8 +1,12 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using System.Collections;
+using UnityEngine.XR.Interaction.Toolkit;
+#if UNITY_EDITOR
+using UnityEngine.XR.Simulation;
+#endif
 
 public class MainUiNavigation : MonoBehaviour
 {
@@ -46,24 +50,33 @@ public class MainUiNavigation : MonoBehaviour
     public GameObject GalleryCapelaSenhoraDasAmoras;
     public GameObject GalleryCapelaSaoDomingos;
 
-    [Header("3D Objects")]
-    public GameObject Obj3dPraiaDosTesos;
-    public GameObject Obj3dPonteVelha;
-    public GameObject Obj3dEstatuaDosMineiros;
-    public GameObject Obj3dLocomotiva;
-    public GameObject Obj3dIgrejaPedorido;
-    public GameObject Obj3dAerodromo;
-    public GameObject Obj3dPocoGermundeII;
-    public GameObject Obj3dMonteSaoDomingos;
+    [Header("UI - AR")]
+    public GameObject UiAr;
+
+    [Header("3D Objects Prefabs")]
+    public GameObject PrefabObj3dPraiaDosTesos;
+    public GameObject PrefabObj3dPonteVelha;
+    public GameObject PrefabObj3dEstatuaDosMineiros;
+    public GameObject PrefabObj3dLocomotiva;
+    public GameObject PrefabObj3dIgrejaPedorido;
+    public GameObject PrefabObj3dAerodromo;
+    public GameObject PrefabObj3dPocoGermundeII;
+    public GameObject PrefabObj3dMonteSaoDomingos;
 
     [Header("Camera")]
     public Camera MainCamera;
     public CameraTouchOrbitController CameraController;
 
+    [Header("Other")]
+    public GameObject EventSystem;
+
     private GameObject _currentUi;
+
+    private GameObject _current3dObject;
     #endregion
 
     #region Unity
+    
     private void Start()
     {
         if (MainCamera == null)
@@ -120,57 +133,110 @@ public class MainUiNavigation : MonoBehaviour
     public void Return()
     {
         var lastUiMenu = _uiMenus[_uiMenus.Count - 1];
+
+        var isArScene = lastUiMenu == UiAr;
+
         lastUiMenu.SetActive(false);
 
         _uiMenus.Remove(lastUiMenu);
 
+        if(_current3dObject  != null)
+        {
+            Destroy(_current3dObject);
+            CameraController.enabled = false;
+        }
+
         ShowCurrentUiMenu();
 
-        if (lastUiMenu == Obj3dPraiaDosTesos)
+        if(isArScene)
         {
-            CameraController.enabled = false;
-            UiPraia3dObj.SetActive(false);
+            UnloadArScene();
         }
-        else if (lastUiMenu == Obj3dPonteVelha)
+    }
+
+    private void UnloadArScene()
+    {
+        StartCoroutine(UnloadArSceneCoroutine());
+    }
+
+    private IEnumerator UnloadArSceneCoroutine()
+    {
+        var unloadOperations = new List<AsyncOperation>();
+
+        // Request unload of the AR scene
+        unloadOperations.Add(SceneManager.UnloadSceneAsync("AR Object View Scene"));
+
+        // Request unload of any simulated environment scenes
+        for (int i = 0; i < SceneManager.sceneCount; i++)
         {
-            CameraController.enabled = false;
-            UiPonteVelha3dObj.SetActive(false);
+            var currentScene = SceneManager.GetSceneAt(i);
+
+            if (currentScene.name.StartsWith("Simulated Environment Scene") && currentScene.IsValid() && currentScene.isLoaded)
+            {
+                unloadOperations.Add(SceneManager.UnloadSceneAsync(currentScene));
+            }
         }
-        else if (lastUiMenu == Obj3dEstatuaDosMineiros)
+
+        // Wait for all unload operations to complete
+        bool allDone = false;
+        while (!allDone)
         {
-            CameraController.enabled = false;
-            UiEstatuaDosMineirosdObj.SetActive(false);
+            allDone = true;
+            for (int i = 0; i < unloadOperations.Count; i++)
+            {
+                if (unloadOperations[i] != null && !unloadOperations[i].isDone)
+                {
+                    allDone = false;
+                    break;
+                }
+            }
+
+            if (!allDone)
+                yield return null;
         }
-        else if (lastUiMenu == Obj3dLocomotiva)
+
+        // Now that the scenes are unloaded, clean up DontDestroyOnLoad objects
+        CleanupPersistentArObjects();
+
+        // Re-enable main camera and event system after cleanup to avoid duplicate listeners
+        if (MainCamera != null)
+            MainCamera.gameObject.SetActive(true);
+        if (EventSystem != null)
+            EventSystem.gameObject.SetActive(true);
+
+        yield break;
+    }
+
+    private void CleanupPersistentArObjects()
+    {
+        var xrManagers = Resources.FindObjectsOfTypeAll<XRInteractionManager>();
+        foreach (var mgr in xrManagers)
         {
-            CameraController.enabled = false;
-            UiLocomotiva3dObj.SetActive(false);
+            if (mgr != null)
+                Destroy(mgr.gameObject);
         }
-        else if (lastUiMenu == Obj3dIgrejaPedorido)
+
+#if UNITY_EDITOR
+        var simCameras = Resources.FindObjectsOfTypeAll<SimulationCameraPoseProvider>();
+        foreach (var obj in simCameras)
         {
-            CameraController.enabled = false;
-            UiIgrejaPedorido3dObj.SetActive(false);
+            if (obj != null)
+                Destroy(obj.gameObject);
         }
-        else if (lastUiMenu == Obj3dAerodromo)
-        {
-            CameraController.enabled = false;
-            UiAerodromo3dObj.SetActive(false);
-        }
-        else if (lastUiMenu == Obj3dPocoGermundeII)
-        {
-            CameraController.enabled = false;
-            UiPocoGermundeII3dObj.SetActive(false);
-        }
-        else if (lastUiMenu == Obj3dMonteSaoDomingos)
-        {
-            CameraController.enabled = false;
-            UiMonteSaoDomingos3dObj.SetActive(false);
-        }
+#endif
+
+        var debugUpdater = GameObject.Find("[Debug Updater]");
+        if (debugUpdater != null)
+            Destroy(debugUpdater);
+
+        var arObject = GameObject.FindGameObjectWithTag("ArObject");
+        if (arObject != null)
+            Destroy(arObject);
     }
 
     public void LoadPraiaUi()
     {
-        _currentUi = UiPraia;
+        _currentUi = UiPraia;   
 
         LoadUi();
     }
@@ -245,7 +311,7 @@ public class MainUiNavigation : MonoBehaviour
         LoadUi();
     }
 
-    //--- Galleries ---
+    #region Galleries
     public void LoadGalleryPraia()
     {
         _currentUi = GalleryPraia;
@@ -315,77 +381,76 @@ public class MainUiNavigation : MonoBehaviour
 
         LoadUi();
     }
-    #endregion //UI Navigation
+    #endregion //Galleries
+
+    #region 3D Objects
+    private void Load3dObject(GameObject ui, GameObject prefabToInstantiate)
+    {
+        _currentUi = ui;
+
+        LoadUi();
+
+        _current3dObject = Instantiate(prefabToInstantiate);
+        CameraController.enabled = true;
+    }
 
     public void Load3dObjectPraiaDosTesos()
     {
-        _currentUi = Obj3dPraiaDosTesos;
-        LoadUi();
-
-        CameraController.enabled = true;
-        UiPraia3dObj.SetActive(true);
+        Load3dObject(UiPraia3dObj, PrefabObj3dPraiaDosTesos);
     }
 
     public void Load3dObjectPonteVelha()
     {
-        _currentUi = Obj3dPonteVelha;
-        LoadUi();
-
-        CameraController.enabled = true;
-        UiPonteVelha3dObj.SetActive(true);
+        Load3dObject(UiPonteVelha3dObj, PrefabObj3dPonteVelha);
     }
 
     public void Load3dObjectEstatuaDosMineiros()
     {
-        _currentUi = Obj3dEstatuaDosMineiros;
-        LoadUi();
-
-        CameraController.enabled = true;
-        UiEstatuaDosMineirosdObj.SetActive(true);
+        Load3dObject(UiEstatuaDosMineirosdObj, PrefabObj3dEstatuaDosMineiros);
     }
 
     public void Load3dObjectLocomotiva()
     {
-        _currentUi = Obj3dLocomotiva;
-        LoadUi();
-
-        CameraController.enabled = true;
-        UiLocomotiva3dObj.SetActive(true);
+        Load3dObject(UiLocomotiva3dObj, PrefabObj3dLocomotiva);
     }
 
     public void Load3dObjectIgrejaPedorido()
     {
-        _currentUi = Obj3dIgrejaPedorido;
-        LoadUi();
-
-        CameraController.enabled = true;
-        UiIgrejaPedorido3dObj.SetActive(true);
+        Load3dObject(UiIgrejaPedorido3dObj, PrefabObj3dIgrejaPedorido);
     }
 
     public void Load3dObjectAerodromo()
     {
-        _currentUi = Obj3dAerodromo;
-        LoadUi();
-
-        CameraController.enabled = true;
-        UiAerodromo3dObj.SetActive(true);
+        Load3dObject(UiAerodromo3dObj, PrefabObj3dAerodromo);
     }
 
     public void Load3dObjectPocoGermundeII()
     {
-        _currentUi = Obj3dPocoGermundeII;
-        LoadUi();
-
-        CameraController.enabled = true;
-        UiPocoGermundeII3dObj.SetActive(true);
+        Load3dObject(UiPocoGermundeII3dObj, PrefabObj3dPocoGermundeII);
     }
 
     public void Load3dObjectMonteSaoDomingos()
     {
-        _currentUi = Obj3dMonteSaoDomingos;
+        Load3dObject(UiMonteSaoDomingos3dObj, PrefabObj3dMonteSaoDomingos);
+    }
+    #endregion //3D Objects
+
+    #region AR Objects
+
+    public void LoadArUiAndScene()
+    {
+        _currentUi = UiAr;
+
         LoadUi();
 
-        CameraController.enabled = true;
-        UiMonteSaoDomingos3dObj.SetActive(true);
+        MainCamera.gameObject.SetActive(false);
+        EventSystem.gameObject.SetActive(false);
+
+        SceneManager.LoadScene("AR Object View Scene", LoadSceneMode.Additive);
     }
+
+    #endregion
+
+    #endregion //UI Navigation
+
 }
