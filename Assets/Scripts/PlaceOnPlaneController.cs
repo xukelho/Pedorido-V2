@@ -19,7 +19,7 @@ public class PlaceOnPlaneController : MonoBehaviour
 
     static List<ARRaycastHit> _arRaycastHits = new List<ARRaycastHit>();
 
-    public MainUiNavigation Main;
+    public bool ValidPosition = false;
 
     #endregion //Fields
 
@@ -27,12 +27,30 @@ public class PlaceOnPlaneController : MonoBehaviour
 
     private void Start()
     {
-        Main = GameObject.FindGameObjectWithTag("Main").GetComponent<MainUiNavigation>();
+        if (MainUiNavigation.Instance != null && MainUiNavigation.Instance.InstantiateArObjBtn != null)
+        {
+            var btn = MainUiNavigation.Instance.InstantiateArObjBtn;
+            // Remove any previous runtime registration to avoid duplicates, then add.
+            btn.onClick.RemoveListener(InstantiateObject);
+            btn.onClick.AddListener(InstantiateObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Remove the listener when this controller is destroyed/unloaded to avoid dangling references.
+        if (MainUiNavigation.Instance != null && MainUiNavigation.Instance.InstantiateArObjBtn != null)
+        {
+            MainUiNavigation.Instance.InstantiateArObjBtn.onClick.RemoveListener(InstantiateObject);
+        }
     }
 
     void Update()
     {
-        PlacePreviewObject();
+        PlacePreviewObjectAndCheckIfPreviewPositionIsValid();
+
+        MainUiNavigation.Instance.InstantiateArObjBtn.interactable = ValidPosition;
+        MainUiNavigation.Instance.TextHelpGuideUsersAr.enabled = !ValidPosition;
     }
     #endregion //Unity
 
@@ -45,23 +63,11 @@ public class PlaceOnPlaneController : MonoBehaviour
         {
             Pose hitPose = _arRaycastHits[0].pose;
 
-            if (PrefabToPlace != null)
-            {
-                var prefabToPlace = GetPrefabToPlace();
+            var prefabToPlace = GetPrefabToPlace();
 
-                var newObj = Instantiate(prefabToPlace, hitPose.position, hitPose.rotation);
-                newObj.SetActive(true);
-                newObj.tag = "ArObject";
-            }
-            else
-            {
-                var primitive = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                primitive.name = "PlacedCube";
-                primitive.transform.position = hitPose.position;
-                primitive.transform.rotation = hitPose.rotation;
-
-                primitive.transform.localScale = Vector3.one * 0.2f;
-            }
+            var newObj = Instantiate(prefabToPlace, hitPose.position, hitPose.rotation);
+            newObj.SetActive(true);
+            newObj.tag = "ArObject";
         }
         else
         {
@@ -71,24 +77,24 @@ public class PlaceOnPlaneController : MonoBehaviour
 
     private GameObject GetPrefabToPlace()
     {
-        var previousUi = Main._uiMenus[Main._uiMenus.Count - 2];
+        var previousUi = MainUiNavigation.Instance.UiMenus[MainUiNavigation.Instance.UiMenus.Count - 2];
 
-        if (previousUi == Main.UiPraia)
-            return Main.PrefabObj3dPraiaDosTesos;
-        if (previousUi == Main.UiPonteVelha)
-            return Main.PrefabObj3dPonteVelha;
-        if (previousUi == Main.UiEstatua)
-            return Main.PrefabObj3dEstatuaDosMineiros;
-        if (previousUi == Main.UiLocomotiva)
-            return Main.PrefabObj3dLocomotiva;
-        if (previousUi == Main.UiIgreja)
-            return Main.PrefabObj3dIgrejaPedorido;
-        if (previousUi == Main.UiAerodromo)
-            return Main.PrefabObj3dAerodromo;
-        if (previousUi == Main.UiMinasPocoDeGermundeII)
-            return Main.PrefabObj3dPocoGermundeII;
-        if (previousUi == Main.UiCapelaSaoDomingos)
-            return Main.PrefabObj3dMonteSaoDomingos;
+        if (previousUi == MainUiNavigation.Instance.UiPraia)
+            return MainUiNavigation.Instance.PrefabObj3dPraiaDosTesos;
+        if (previousUi == MainUiNavigation.Instance.UiPonteVelha)
+            return MainUiNavigation.Instance.PrefabObj3dPonteVelha;
+        if (previousUi == MainUiNavigation.Instance.UiEstatua)
+            return MainUiNavigation.Instance.PrefabObj3dEstatuaDosMineiros;
+        if (previousUi == MainUiNavigation.Instance.UiLocomotiva)
+            return MainUiNavigation.Instance.PrefabObj3dLocomotiva;
+        if (previousUi == MainUiNavigation.Instance.UiIgreja)
+            return MainUiNavigation.Instance.PrefabObj3dIgrejaPedorido;
+        if (previousUi == MainUiNavigation.Instance.UiAerodromo)
+            return MainUiNavigation.Instance.PrefabObj3dAerodromo;
+        if (previousUi == MainUiNavigation.Instance.UiMinasPocoDeGermundeII)
+            return MainUiNavigation.Instance.PrefabObj3dPocoGermundeII;
+        if (previousUi == MainUiNavigation.Instance.UiCapelaSaoDomingos)
+            return MainUiNavigation.Instance.PrefabObj3dMonteSaoDomingos;
 
         return null;
     }
@@ -101,8 +107,10 @@ public class PlaceOnPlaneController : MonoBehaviour
         return true;
     }
 
-    private void PlacePreviewObject()
+    private void PlacePreviewObjectAndCheckIfPreviewPositionIsValid()
     {
+        ValidPosition = false;
+
         var hasPlanes = HasAnyPlanes();
 
         if (PreviewPositionValid == null || !hasPlanes)
@@ -137,6 +145,8 @@ public class PlaceOnPlaneController : MonoBehaviour
 
             PreviewPositionValid.transform.position = hitPose.Value.position;
             PreviewPositionValid.transform.rotation = hitPose.Value.rotation;
+
+            ValidPosition = true;
         }
     }
 
