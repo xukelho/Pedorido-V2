@@ -21354,7 +21354,7 @@ MonoBehaviour:
   minPitch: -80
   maxPitch: 80
   pinchZoomSensitivity: 0.01
-  minDistance: 1
+  minDistance: 0.2
   maxDistance: 20
   simulateMouse: 1
   smoothTime: 0.04
